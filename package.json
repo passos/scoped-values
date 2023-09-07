@@ -1,6 +1,6 @@
 {
   "name": "scoped-values",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A JS library simulating Kotlin's scope functions.",
   "main": "index.js",
   "files": [

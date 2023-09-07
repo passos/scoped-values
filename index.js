@@ -1,4 +1,4 @@
-class ValueObject {
+class ScopedValue {
   constructor(value) {
     this.value = value;
   }
@@ -7,7 +7,7 @@ class ValueObject {
     if (typeof fn !== "function") {
       return this;
     }
-    return this.value !== null && this.value !== undefined ? ProxyValueObject(fn?.(this.value)) : this;
+    return this.value !== null && this.value !== undefined ? ProxyScopedValue(fn?.(this.value)) : this;
   }
 
   run(fn) {
@@ -16,7 +16,7 @@ class ValueObject {
 
   also(fn) {
     this.value !== null && this.value !== undefined && fn?.(this.value);
-    return ProxyValueObject(this.value);
+    return ProxyScopedValue(this.value);
   }
 }
 
@@ -26,7 +26,7 @@ const handler = {
       if (typeof target[propKey] === 'function') {
         return function (...args) {
           const result = target[propKey].apply(target, args);
-          return result instanceof ValueObject ? ProxyValueObject(result.value) : result;
+          return result instanceof ScopedValue ? ProxyScopedValue(result.value) : result;
         };
       }
       return target[propKey];
@@ -36,13 +36,13 @@ const handler = {
     if (typeof valueProperty === 'function') {
       return function (...args) {
         const result = valueProperty.apply(target.value, args);
-        return ProxyValueObject(result);
+        return ProxyScopedValue(result);
       };
     }
-    return ProxyValueObject(valueProperty);
+    return ProxyScopedValue(valueProperty);
   }
 };
 
-const ProxyValueObject = (value) => new Proxy(new ValueObject(value), handler);
+const ProxyScopedValue = (value) => new Proxy(new ScopedValue(value), handler);
 
-export default ProxyValueObject;
+export default ProxyScopedValue;
